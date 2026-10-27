@@ -1,0 +1,20 @@
+# videos and per-reel work files stay on the computer, not in git
+להעלאה/*
+לאישור/*
+מוכן/*
+work/*
+!להעלאה/.gitkeep
+!לאישור/.gitkeep
+!מוכן/.gitkeep
+!work/.gitkeep
+*.mp4
+*.mov
+*.MOV
+*.m4v
+
+# secrets and local environments
+.env
+.venv/
+node_modules/
+__pycache__/
+.DS_Store
