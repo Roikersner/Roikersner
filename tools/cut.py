@@ -3,6 +3,7 @@
 keep.json (written by Claude after reading transcript_cut.txt):
   {"keep": [1, 2, 5, 6, 7, ...]}              # line ids from the cut transcript
   optional "ranges": [[12.3, 15.8], ...]      # extra explicit source ranges (seconds)
+  optional "remove": [[s, e], ...]            # exact source ranges to drop (a stutter with no pause)
   optional "npl": 200                          # HDR tone-map peak (see hdr_check.py)
 
 Usage:
@@ -129,6 +130,18 @@ def main():
     ranges = [[l["start"], l["end"]] for l in lines if l["id"] in ids] + keep.get("ranges", [])
     audio = load_audio(a.src, SR)
     final = refine(ranges, audio)
+    # "remove": exact source ranges to drop with no edge adjustment (stutters inside continuous speech)
+    for rs, re_ in keep.get("remove", []):
+        nxt = []
+        for s, e in final:
+            if re_ <= s or rs >= e:
+                nxt.append([s, e])
+            else:
+                if rs - s > 0.05:
+                    nxt.append([s, rs])
+                if e - re_ > 0.05:
+                    nxt.append([re_, e])
+        final = nxt
     new_len = sum(e - s for s, e in final)
 
     if a.plan:
